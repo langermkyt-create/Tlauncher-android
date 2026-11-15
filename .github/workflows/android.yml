@@ -28,13 +28,20 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Locate Android SDK tools
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME:-/usr/local/lib/android/sdk}" >> "$GITHUB_ENV"
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
+          test -n "$SDKMANAGER"
+          echo "$(dirname "$SDKMANAGER")" >> "$GITHUB_PATH"
+          echo "$SDKMANAGER" > "$RUNNER_TEMP/sdkmanager-path"
 
       - name: Install Android native build dependencies
         run: |
-          sdkmanager "platforms;android-37" "build-tools;37.0.0" "ndk;27.3.13750724"
-          yes | sdkmanager --licenses
+          SDKMANAGER="$(cat "$RUNNER_TEMP/sdkmanager-path")"
+          yes | "$SDKMANAGER" --licenses || true
+          "$SDKMANAGER" --install "platforms;android-37" "build-tools;37.0.0" "ndk;27.3.13750724"
 
       - name: Download multi-architecture Java runtime
         uses: dawidd6/action-download-artifact@v9
