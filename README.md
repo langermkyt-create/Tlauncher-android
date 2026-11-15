@@ -1,37 +1,28 @@
-# TLauncher Android
+# TLauncher Android — Minecraft Java runtime prototype
 
-Android-проект, цель которого — перенести доступные возможности TLauncher Desktop в удобный сенсорный лаунчер Minecraft Java Edition.
+Цель проекта — создать удобный Android-лаунчер Minecraft Java Edition с сенсорным управлением, профилями и установкой модификаций.
 
-## Текущее состояние
+## Что изменено сейчас
 
-Это начальный каркас, а не готовый лаунчер: добавлены Android/Compose-проект, базовый мобильный интерфейс и автоматическая CI-сборка debug APK. Запуск Minecraft, загрузчик версий, авторизация и установка модов ещё не подключены.
+GitHub Actions теперь собирает не прежнюю пустую Compose-оболочку, а Android runtime Amethyst (проект на базе PojavLauncher), который предназначен для запуска Minecraft Java Edition на Android. В upstream-проекте заявлена поддержка широкого набора версий Minecraft и моддинга через Forge и Fabric.
 
-## План разработки
+Сборка получает исходники Amethyst с рекурсивными submodules, скачивает multi-architecture Java runtime и собирает debug APK. Артефакт называется `tlauncher-android-runtime-debug`.
 
-1. Изучить доступные исходники TLauncher Desktop и ограничения лицензии/совместимости.
-2. Подключить Android runtime для Minecraft Java Edition на основе совместимого проекта с соблюдением его LGPL-лицензии и требований публикации.
-3. Реализовать загрузку версий, библиотек и проверку целостности файлов.
-4. Реализовать профили/экземпляры, установку Fabric/Forge/NeoForge/Quilt там, где это поддерживает runtime.
-5. Реализовать поиск, установку, обновление и удаление модов, импорт/экспорт modpack.
-6. Добавить Microsoft OAuth через официальный безопасный поток; не собирать пароли Microsoft.
-7. Добавить экранные игровые контролы, настройки производительности, логи и диагностику.
-8. Проверять сборку на реальных ARM64-устройствах и публиковать тестовые APK.
+**Важно:** это пока интеграция существующего Android runtime как основы, а не законченный самостоятельный форк с собственным интерфейсом TLauncher. APK будет иметь приложение/интерфейс Amethyst upstream. Необходимо отдельно реализовать брендинг и интеграцию нашего мобильного UI, проверить загрузку модов на устройстве, Microsoft OAuth и совместимость конкретных версий/модлоадеров.
 
 ## Сборка
 
-GitHub Actions собирает `:app:assembleDebug` при push в `main` и загружает APK как артефакт workflow.
+Workflow запускается при push в `main` или вручную через GitHub Actions:
 
-Требуются JDK 17 и Gradle 8.9:
+https://github.com/langermkyt-create/Tlauncher-android/actions
 
-```bash
-gradle :app:assembleDebug
-```
+После успешного выполнения скачай артефакт `tlauncher-android-runtime-debug`.
 
-APK: `app/build/outputs/apk/debug/app-debug.apk`.
+## Основа и лицензии
 
-## Источники и лицензии
-
+- Amethyst Android: https://github.com/AngelAuraMC/Amethyst-Android
+- Ветка сборки: `v3_openjdk`
+- Лицензия Amethyst: LGPL-3.0. При распространении производной сборки необходимо соблюдать LGPL, сохранять уведомления и предоставлять соответствующий исходный код/изменения.
 - TLauncher Desktop: https://github.com/tlauncher/TLauncher-Desktop
-- Android Minecraft runtime candidate: https://github.com/AngelAuraMC/Amethyst-Android (LGPL-3.0; требуется отдельная проверка совместимости, лицензий и сборочного процесса).
 
-Проект не заявляет об аффилированности с TLauncher. Название используется для обозначения цели совместимости.
+Проект не аффилирован с Mojang, Microsoft, TLauncher или командой Amethyst. Minecraft — продукт Mojang/Microsoft.
